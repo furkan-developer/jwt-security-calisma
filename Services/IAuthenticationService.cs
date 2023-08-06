@@ -9,5 +9,6 @@ namespace JWT_Security.Services
     public interface IAuthenticationService
     {
         Task<ResultStructure.IResult> Registration(UserRegistrationModel userModel);
+        Task<ResultStructure.IResult> Validate(UserLoginModel userModel);
     }
 }

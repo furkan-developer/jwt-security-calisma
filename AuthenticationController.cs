@@ -30,5 +30,17 @@ namespace JWT_Security
 
             return Ok(result);
         }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginModel userModel)
+        {
+            var result = await _authenticationService.Validate(userModel);
+            if (!result.Process)
+                return Unauthorized(result); 
+
+            // Create token
+            
+            return Ok();
+        }
     }
 }

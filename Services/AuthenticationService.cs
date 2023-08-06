@@ -20,7 +20,7 @@ namespace JWT_Security.Services
         }
 
         public async Task<ResultStructure.IResult> Registration(UserRegistrationModel userModel)
-        {   
+        {
             // mapping
             AppUser user = new()
             {
@@ -42,10 +42,23 @@ namespace JWT_Security.Services
 
                 return new ErrorResult(stringBuilder.ToString());
             }
-            
+
             await _userManager.AddToRoleAsync(user, "Visitor");
-        
+
             return new SuccessResult("Kayıt işlemi başarılı.");
+        }
+
+        public async Task<ResultStructure.IResult> Validate(UserLoginModel userModel)
+        {
+            var user = await _userManager.FindByEmailAsync(userModel.Email);
+            
+            var result = (user != null && await _userManager.CheckPasswordAsync(user, userModel.Password));
+            if (!result)
+            {
+                return new ErrorResult("Authenticate işlemi başarısız. E-mail veya şifre yanlış");
+            }
+
+            return new SuccessResult();
         }
     }
 }
