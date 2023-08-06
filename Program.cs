@@ -1,5 +1,6 @@
 using JWT_Security.Entities;
 using JWT_Security.Repositoreis;
+using JWT_Security.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IAuthenticationService,AuthenticationService>();
 
 // Configure Sql Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
