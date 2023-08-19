@@ -10,5 +10,6 @@ namespace JWT_Security.Services
     {
         Task<ResultStructure.IResult> Registration(UserRegistrationModel userModel);
         Task<ResultStructure.IResult> Validate(UserLoginModel userModel);
+        string CreateJwtToken();
     }
 }

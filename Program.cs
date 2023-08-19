@@ -13,6 +13,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped(serviceProvider => 
+    builder.Configuration.GetSection("JwtSettings").Get<JwtTokenConfig>());
+
 builder.Services.AddScoped<IAuthenticationService,AuthenticationService>();
 
 // Configure Sql Server

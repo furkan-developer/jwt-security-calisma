@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using JWT_Security.Entities;
 using JWT_Security.Models;
 using JWT_Security.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace JWT_Security
 {
@@ -36,11 +39,15 @@ namespace JWT_Security
         {
             var result = await _authenticationService.Validate(userModel);
             if (!result.Process)
-                return Unauthorized(result); 
+                return Unauthorized(result);
 
             // Create token
-            
-            return Ok();
+            string jwtToken = _authenticationService.CreateJwtToken();
+
+            return Ok(new
+            {
+                AccesToken = jwtToken
+            });
         }
     }
 }
