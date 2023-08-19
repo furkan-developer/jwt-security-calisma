@@ -1,8 +1,11 @@
+using System.Text;
 using JWT_Security.Entities;
 using JWT_Security.Repositoreis;
 using JWT_Security.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,10 +16,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped(serviceProvider => 
-    builder.Configuration.GetSection("JwtSettings").Get<JwtTokenConfig>());
+var jwtTokenConfig = builder.Configuration.GetSection("JwtSettings").Get<JwtTokenConfig>();
 
-builder.Services.AddScoped<IAuthenticationService,AuthenticationService>();
+builder.Services.AddScoped(serviceProvider =>
+    jwtTokenConfig);
+
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 // Configure Sql Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -36,6 +41,26 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
+    options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtTokenConfig.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtTokenConfig.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenConfig.Secret)),
+            ValidateLifetime = true,
+        };
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -47,6 +72,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
